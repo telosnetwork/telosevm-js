@@ -1,6 +1,6 @@
 {
   "name": "@telosnetwork/telosevm-js",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Telos EVM JS SDK",
   "keywords": [],
   "main": "dist/telosevm-js.umd.js",
@@ -26,7 +26,7 @@
     "prebuild": "rm -rf dist",
     "build": "tsc --module commonjs && rollup -c rollup.config.ts",
     "start": "rollup -c rollup.config.ts -w",
-    "test": "jest --coverage --runInBand --testPathIgnorePatterns debugging",
+    "test-off": "jest --coverage --runInBand --testPathIgnorePatterns debugging",
     "debug": "jest --coverage --runInBand debugging",
     "test:watch": "jest --coverage --runInBand --watch",
     "test:prod": "npm run lint && npm run test -- --no-cache",
