@@ -988,7 +988,7 @@
     pirates "^4.0.0"
     source-map-support "^0.5.16"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.8.4":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.2.0", "@babel/runtime@^7.8.4":
   version "7.12.13"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.12.13.tgz#0a21452352b02542db0ffb928ac2d3ca7cb6d66d"
   integrity sha512-8+3UMPBrjFa/6TtKi/7sehPKqfAm4g6K+YQjyyFOLUTxzOngcRZTlAVY8sc2CORJYqdHQY8gRPHmn+qo15rCBw==
@@ -1196,15 +1196,6 @@
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.2.tgz#26520bf09abe4a5644cd5414e37125a8954241dd"
   integrity sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==
-
-"@jafri/eosjs2@^21.0.0-rc.14":
-  version "21.0.0-rc.17"
-  resolved "https://registry.yarnpkg.com/@jafri/eosjs2/-/eosjs2-21.0.0-rc.17.tgz#2541d39fb94d1959d745a9ff3a6d169b98ec8b04"
-  integrity sha512-nrETrjwWWg4iUWXI+FEIfJYzmqofyUS8fTvQSdsjcjxTBHiutVb6Ct8yrGn4XXbBbn/FEq3AF8ovoia53U9Wsg==
-  dependencies:
-    bs58 "^4.0.1"
-    elliptic "^6.5.2"
-    ripemd-ts "0.0.1"
 
 "@jest/console@^26.6.2":
   version "26.6.2"
@@ -2646,7 +2637,7 @@ bs-logger@0.x:
   dependencies:
     fast-json-stable-stringify "2.x"
 
-bs58@^4.0.0, bs58@^4.0.1:
+bs58@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/bs58/-/bs58-4.0.1.tgz#be161e76c354f6f788ae4071f63f34e8c4f0a42a"
   integrity sha1-vhYedsNU9veIrkBx9j806MTwpCo=
@@ -10279,11 +10270,6 @@ rimraf@^3.0.0:
   integrity sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
   dependencies:
     glob "^7.1.3"
-
-ripemd-ts@0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/ripemd-ts/-/ripemd-ts-0.0.1.tgz#da14454f8e149dfc62239cd6dd2defe373e4dc7b"
-  integrity sha512-DVx3aasP1ipmZmiL7ECBRMRLV3FEvtCRPpNcnyM2OlNcdKG2D/4TK6bQTpUDgPOJ2WwCZ0MMASPI7QweFBzYrw==
 
 ripemd160@^2.0.0, ripemd160@^2.0.1:
   version "2.0.2"
