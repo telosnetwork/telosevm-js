@@ -24,6 +24,7 @@
   "scripts": {
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rm -rf dist",
+    "prepublish": "yarn prebuild && yarn build",
     "build": "tsc --module commonjs && rollup -c rollup.config.ts",
     "start": "rollup -c rollup.config.ts -w",
     "test-off": "jest --coverage --runInBand --testPathIgnorePatterns debugging",
@@ -88,6 +89,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/runtime": "^7.2.0",
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
     "@openzeppelin/contracts": "^3.0.0-beta.0",

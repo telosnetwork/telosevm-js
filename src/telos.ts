@@ -1,5 +1,5 @@
 import { Api, JsonRpc } from 'eosjs'
-import { JsSignatureProvider } from '@jafri/eosjs2/dist/eosjs-jssig'
+import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import { TextEncoder, TextDecoder } from 'text-encoding'
 import { EOSIO_TOKEN } from './constants'
 import { Account } from './interfaces'
