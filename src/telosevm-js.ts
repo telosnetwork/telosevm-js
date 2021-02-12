@@ -28,7 +28,8 @@ export class TelosEvmApi {
     endpoint,
     telosContract,
     ethContract,
-    chainId = DEFAULT_CHAIN_ID
+    chainId = DEFAULT_CHAIN_ID,
+    fetch
   }: {
     ethPrivateKeys?: any
     telosPrivateKeys: string[]
@@ -36,8 +37,14 @@ export class TelosEvmApi {
     telosContract: string
     ethContract?: string
     chainId: number
+    fetch: any
   }) {
-    this.telos = new TelosApi({ telosPrivateKeys, endpoint, telosContract })
+    this.telos = new TelosApi({
+      telosPrivateKeys,
+      endpoint,
+      telosContract,
+      fetch
+    })
     this.chainId = chainId
     this.ethContract = ethContract
     this.chainConfig = Common.forCustomChain(ETH_CHAIN, { chainId }, FORK)

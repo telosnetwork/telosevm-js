@@ -1,9 +1,6 @@
 import { Api, JsonRpc, Serialize } from '@jafri/eosjs2'
 import { JsSignatureProvider } from '@jafri/eosjs2/dist/eosjs-jssig'
-import fetch from 'node-fetch'
 import { TextEncoder, TextDecoder } from 'text-encoding'
-import { readFileSync } from 'fs'
-import { getDeployableFilesFromDir } from './deploy'
 import { EOSIO_TOKEN } from './constants'
 import { Account } from './interfaces'
 const BN = require('bn.js')
@@ -32,11 +29,13 @@ export class TelosApi {
   constructor({
     telosPrivateKeys,
     endpoint,
-    telosContract
+    telosContract,
+    fetch
   }: {
     telosPrivateKeys: Array<string>
     endpoint: string
     telosContract: string
+    fetch: any
   }) {
     this.telosPrivateKeys = telosPrivateKeys
     this.signatureProvider = new JsSignatureProvider(this.telosPrivateKeys)
