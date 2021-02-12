@@ -131,8 +131,8 @@
     "typescript": "^4.1.0"
   },
   "dependencies": {
-    "@jafri/eosjs2": "^21.0.0-rc.14",
     "bn.js": "^5.1.1",
+    "eosjs": "^21.0.3",
     "ethereumjs-abi": "^0.6.8",
     "ethereumjs-common": "^1.5.0",
     "ethereumjs-tx": "^2.1.2",
