@@ -107,6 +107,7 @@ export class TelosApi {
         account: this.telosContract,
         name: 'raw',
         data: {
+          ram_payer: account,
           tx,
           sender
         },
@@ -160,6 +161,7 @@ export class TelosApi {
           account: this.telosContract,
           name: 'call',
           data: {
+            ram_payer: account,
             tx,
             sender
           },

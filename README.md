@@ -11,7 +11,7 @@ npm install @telosnetwork/telosevm-js
 ### How to setup EVM and deploy ERC-20 Token on EOSIO in 5 minutes
 
 ```js
-const { TelosApiEvmApi } = require('telosevm-js')
+const { TelosEvmApi } = require('telosevm-js')
 
 const evmContractAccount = 'evmcontract2'
 const evmNormalAccount = 'evmaccount11'
