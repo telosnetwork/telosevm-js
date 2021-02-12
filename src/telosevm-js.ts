@@ -235,9 +235,10 @@ export class TelosEvmApi {
    * @param {object} [args={}] Arguments
    * @param {string} [args.account] The Telos account associated to ETH address
    * @param {string} [args.sender] The ETH address sending the TX
-   * @param {string} [args.to] The ETH address sending the transaction (nonce is fetched on-chain for this address)
-   * @param {string} [args.quantity] The ETH address sending the transaction (nonce is fetched on-chain for this address)
+   * @param {string} [args.to] The ETH address receiving the transfer
+   * @param {string} [args.quantity] The amount to transfer
    * @param {boolean} [args.rawSign] Whether to sign transaction with ethereum private key. False means to use Telos authorization
+   * @param {boolean} [args.returnRaw] Whether to actually execute the transfer or just return the raw transfer transaction
    *
    * @returns {Promise<EvmResponse>} EVM receipt and Telos receipt
    */
@@ -247,13 +248,15 @@ export class TelosEvmApi {
       sender,
       to,
       quantity,
-      rawSign = false
+      rawSign = false,
+      returnRaw = false
     }: {
       account: string
       sender: string
       to: string
       quantity: string
       rawSign?: boolean
+      returnRaw?: boolean
     },
     overrides?: any
   ) {
@@ -274,6 +277,8 @@ export class TelosEvmApi {
       overrides
     )
     const tx = await this.createEthTx(params)
+    if (returnRaw) return tx
+
     return this.telos.raw({ account, tx, sender })
   }
 
