@@ -1,4 +1,4 @@
-import { TelosEvmApi } from '../src/telos-evm-js'
+import { TelosEvmApi } from '../src/telosevm-js'
 const BN = require('bn.js')
 const compiled = require('../src/eth-contracts/compiled.json')
 
@@ -22,12 +22,12 @@ export const initialAccount = {
 export const api = new TelosEvmApi({
   endpoint: 'https://api.telos-test.eostribe.io',
   chainId: 1,
-  tlosContract: contract,
+  telosContract: contract,
   ethPrivateKeys: [
     '0x8dd3ec4846cecac347a830b758bf7e438c4d9b36a396b189610c90b57a70163d', // 0xf79b834a37f3143f4a73fc3934edac67fd3a01cd
     '0x206cbcc0ccbb96a0df7ba079d25866bd0d52f4248861a0a38bc9bfd58c00556a' // 0xab21f17d0c3e30be30e115508643817b297ae8d6
   ],
-  tlosPrivateKeys: [
+  telosPrivateKeys: [
     '5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3',
     '5K93jQD9fruYKPpifxD6CrSNw1G3kUb1QjekzR3CkQaBvcq5JJq',
     '5JACk8gJ98x3AkypbicNQviXzkqAM2wbbE3FtA79icT2Ks4bWws'
