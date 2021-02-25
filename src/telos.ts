@@ -270,33 +270,6 @@ export class TelosApi {
       }
     ])
   }
-  /**
-   * Testing: Creates account for eth tests
-   *
-   * @returns {Promise<any>} Telos TX response
-   */
-  async devNewAccount(
-    address: string,
-    balance: string,
-    code: string,
-    nonce: number,
-    account: string = ''
-  ) {
-    return await this.transact([
-      {
-        account: this.telosContract,
-        name: 'devnewacct',
-        data: {
-          address,
-          balance,
-          code: Uint8Array.from(Buffer.from(code, 'hex')),
-          nonce,
-          account
-        },
-        authorization: [{ actor: this.telosContract, permission: 'active' }]
-      }
-    ])
-  }
 
   /**
    * Fetches tables based on data

@@ -2,6 +2,7 @@ import { Transaction } from 'ethereumjs-tx'
 import Common from 'ethereumjs-common'
 import { privateToAddress } from 'ethereumjs-util'
 import { TelosApi } from './telos'
+export * from './transaction'
 import {
   ETH_CHAIN,
   FORK,
@@ -13,6 +14,7 @@ import {
   DEFAULT_SYMBOL
 } from './constants'
 const abiEncoder = require('ethereumjs-abi')
+
 export class TelosEvmApi {
   ethPrivateKeys: any
   chainId: any
