@@ -80,7 +80,7 @@ class EVMTransaction  {
 
     toTransaction() {
         return formatTransaction({
-            blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block).toString('hex'),
+            blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block),
             blockNumber: this.receiptRow.block.toString(16),
             from: this.actionData.sender,
             gas: this.transaction.gasLimit.toString('hex'),
@@ -101,7 +101,7 @@ class EVMTransaction  {
         return formatTransaction({
             transactionHash: this.receiptRow.hash,
             transactionIndex: this.receiptRow.trx_index.toString(16),
-            blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block).toString('hex'),
+            blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block),
             blockNumber: this.receiptRow.block.toString(16),
             from: this.actionData.sender,
             to: this.transaction.to.toString('hex'),
@@ -115,7 +115,7 @@ class EVMTransaction  {
     }
 
     static blockNumberToHash(num) {
-        return keccak256(num.toString(16))    
+        return keccak256(num.toString(16)).toString('hex')
     }
 
     static async fromHash(rpc, hyperionAxios, telosContract, hash, from, transactionData) {
