@@ -74,9 +74,13 @@ class EVMTransaction  {
         this.transaction = new Transaction(`0x${actionData.tx.toLowerCase()}`)
     }
 
-    toTransaction(transactionIndex) {
+    getBlockNumber() {
+        return this.receiptRow.block.toString(16)
+    }
+
+    toTransaction() {
         return formatTransaction({
-            blockHash: blockNumberToHash(this.receiptRow.block).toString('hex'),
+            blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block).toString('hex'),
             blockNumber: this.receiptRow.block.toString(16),
             from: this.actionData.sender,
             gas: this.transaction.gasLimit.toString('hex'),
@@ -85,7 +89,7 @@ class EVMTransaction  {
             input: this.transaction.data.toString('hex'),
             nonce: this.transaction.nonce.toString('hex'),
             to: this.transaction.to.toString('hex'),
-            transactionIndex: transactionIndex ? transactionIndex.toString(16) : null,
+            transactionIndex: this.receiptRow.trx_index.toString(16),
             value: this.transaction.value.toString('hex'),
             v: this.transaction.v.toString('hex'),
             r: this.transaction.r.toString('hex'),
@@ -93,14 +97,11 @@ class EVMTransaction  {
         })
     }
 
-    toTransactionReceipt(transactionIndex) {
-        if (!transactionIndex)
-            return null
-
+    toTransactionReceipt() {
         return formatTransaction({
             transactionHash: this.receiptRow.hash,
-            transactionIndex: transactionIndex,
-            blockHash: blockNumberToHash(this.receiptRow.block).toString('hex'),
+            transactionIndex: this.receiptRow.trx_index.toString(16),
+            blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block).toString('hex'),
             blockNumber: this.receiptRow.block.toString(16),
             from: this.actionData.sender,
             to: this.transaction.to.toString('hex'),
@@ -111,6 +112,10 @@ class EVMTransaction  {
             logsBloom: LOGS_BLOOM_EMPTY,
             status: this.receiptRow.status.toString(16)
         })
+    }
+
+    static blockNumberToHash(num) {
+        return keccak256(num.toString(16))    
     }
 
     static async fromHash(rpc, hyperionAxios, telosContract, hash, from, transactionData) {
@@ -166,10 +171,6 @@ function formatTransaction(trx) {
   function shouldUpperCaseReturn(keyName) {
     let upperCaseProps = ["to", "from", "contractAddress"];
     return upperCaseProps.includes(keyName);
-  }
-
-  function blockNumberToHash(num) {
-      return keccak256(num.toString(16))    
   }
 
 module.exports = { EVMTransaction }
