@@ -3,6 +3,8 @@ import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import { TextEncoder, TextDecoder } from 'text-encoding'
 import { EOSIO_TOKEN } from './constants'
 import { Account } from './interfaces'
+import { Transaction } from 'ethereumjs-tx'
+
 const BN = require('bn.js')
 
 const transformEthAccount = (account: Account) => {
@@ -114,6 +116,12 @@ export class TelosApi {
       }
     ])
 
+    let trx = new Transaction(`0x${tx}`)
+    response.eth = {
+      transactionHash: trx.hash
+    }
+
+    /*
     try {
       response.eth = JSON.parse(
         response.telos.processed.action_traces[0].console
@@ -129,6 +137,8 @@ export class TelosApi {
     if (response.eth === '') {
       console.warn('Warning: This node may have console printing disabled')
     }
+
+    */
 
     return response
   }
