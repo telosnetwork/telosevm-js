@@ -78,6 +78,14 @@ class EVMTransaction  {
         return this.receiptRow.block.toString(16)
     }
 
+    getTransactionIndex() {
+        return this.receiptRow.trx
+    }
+
+    getTransactionHash() {
+        return this.receiptRow.hash
+    }
+
     toTransaction() {
         return formatTransaction({
             blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block),
