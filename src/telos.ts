@@ -4,6 +4,8 @@ import { TextEncoder, TextDecoder } from 'text-encoding'
 import { EOSIO_TOKEN } from './constants'
 import { Account } from './interfaces'
 import { Transaction } from 'ethereumjs-tx'
+import Common from 'ethereumjs-common'
+import { ETH_CHAIN, FORK } from './constants'
 
 const BN = require('bn.js')
 
@@ -27,17 +29,20 @@ export class TelosApi {
   rpc: any
   api: any
   telosContract: string
+  chainConfig: any
 
   constructor({
     telosPrivateKeys,
     endpoint,
     telosContract,
-    fetch
+    fetch,
+    chainId
   }: {
     telosPrivateKeys: Array<string>
     endpoint: string
     telosContract: string
     fetch: any
+    chainId: any
   }) {
     this.telosPrivateKeys = telosPrivateKeys
     this.signatureProvider = new JsSignatureProvider(this.telosPrivateKeys)
@@ -48,6 +53,7 @@ export class TelosApi {
       textEncoder: new TextEncoder() as any,
       textDecoder: new TextDecoder() as any
     })
+    this.chainConfig = Common.forCustomChain(ETH_CHAIN, { chainId }, FORK)
     this.telosContract = telosContract
   }
 
@@ -116,7 +122,7 @@ export class TelosApi {
       }
     ])
 
-    let trx = new Transaction(`0x${tx}`)
+    let trx = new Transaction(`0x${tx}`, { common: this.chainConfig })
     response.eth = {
       transactionHash: trx.hash
     }
