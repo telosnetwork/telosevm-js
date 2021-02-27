@@ -1,4 +1,3 @@
-
 /*  eth_getTransactionByHash
 Object - A transaction object, or null when no transaction was found:
 
@@ -63,122 +62,157 @@ uncles: Array - Array of uncle hashes.
 */
 
 const { Transaction } = require('ethereumjs-tx')
+const Common = require('ethereumjs-common')
 const { keccak256 } = require('ethereumjs-util')
 const { TextEncoder } = require('text-encoding')
-const LOGS_BLOOM_EMPTY = '0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+const LOGS_BLOOM_EMPTY =
+  '0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+const { ETH_CHAIN, FORK } = require('./constants')
 
-class EVMTransaction  {
-    constructor(receiptRow, actionData) {
-        this.receiptRow = receiptRow
-        this.actionData = actionData
-        this.transaction = new Transaction(`0x${actionData.tx.toLowerCase()}`)
+class EVMTransaction {
+  constructor(receiptRow, actionData) {
+    this.receiptRow = receiptRow
+    this.actionData = actionData
+    this.chainConfig = Common.forCustomChain(ETH_CHAIN, { chainId }, FORK)
+    this.transaction = new Transaction(`0x${actionData.tx.toLowerCase()}`,  { common: this.chainConfig })
+  }
+
+  getBlockNumber() {
+    return this.receiptRow.block.toString(16)
+  }
+
+  getTransactionIndex() {
+    return this.receiptRow.trx
+  }
+
+  getTransactionHash() {
+    return this.receiptRow.hash
+  }
+
+  toTransaction() {
+    return formatTransaction({
+      blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block),
+      blockNumber: this.receiptRow.block.toString(16),
+      from: this.actionData.sender,
+      gas: this.transaction.gasLimit.toString('hex'),
+      gasPrice: this.transaction.gasPrice.toString('hex'),
+      hash: this.receiptRow.hash,
+      input: this.transaction.data.toString('hex'),
+      nonce: this.transaction.nonce.toString('hex'),
+      to: this.transaction.to.toString('hex'),
+      transactionIndex: this.receiptRow.trx_index.toString(16),
+      value: this.transaction.value.toString('hex'),
+      v: this.transaction.v.toString('hex'),
+      r: this.transaction.r.toString('hex'),
+      s: this.transaction.s.toString('hex')
+    })
+  }
+
+  toTransactionReceipt() {
+    return formatTransaction({
+      transactionHash: this.receiptRow.hash,
+      transactionIndex: this.receiptRow.trx_index.toString(16),
+      blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block),
+      blockNumber: this.receiptRow.block.toString(16),
+      from: this.actionData.sender,
+      to: this.transaction.to.toString('hex'),
+      cumulativeGasUsed: this.receiptRow.gasused,
+      gasUsed: this.receiptRow.gasused,
+      contractAddress: this.receiptRow.createdaddr
+        ? this.receiptRow.createdaddr
+        : null,
+      logs: JSON.parse(this.receiptRow.logs || []),
+      logsBloom: LOGS_BLOOM_EMPTY,
+      status: this.receiptRow.status.toString(16)
+    })
+  }
+
+  static blockNumberToHash(num) {
+    return keccak256(num.toString(16)).toString('hex')
+  }
+
+  static async fromHash(
+    rpc,
+    hyperionAxios,
+    telosContract,
+    hash,
+    from,
+    transactionData
+  ) {
+    let receiptRows = await rpc.get_table_rows({
+      code: telosContract,
+      scope: telosContract,
+      table: 'receipt',
+      key_type: 'sha256',
+      index_position: 2,
+      lower_bound: hash,
+      upper_bound: hash,
+      limit: 1
+    })
+
+    if (receiptRows.rows.length && receiptRows.rows[0].hash == hash) {
+      let receiptRow = receiptRows.rows[0]
+      let actionData
+      if (!transactionData || !from) {
+        let transactionResult = await hyperionAxios.get(
+          `/v2/history/get_transaction?id=${receiptRow.trxid}`
+        )
+        let action = transactionResult.data.actions.find(
+          action =>
+            action.act.account == telosContract && action.act.name == 'raw'
+        )
+        actionData = action.act.data
+      } else {
+        actionData = { tx: transactionData, sender: from }
+      }
+      return new EVMTransaction(receiptRow, actionData)
+    } else {
+      return null
     }
-
-    getBlockNumber() {
-        return this.receiptRow.block.toString(16)
-    }
-
-    getTransactionIndex() {
-        return this.receiptRow.trx
-    }
-
-    getTransactionHash() {
-        return this.receiptRow.hash
-    }
-
-    toTransaction() {
-        return formatTransaction({
-            blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block),
-            blockNumber: this.receiptRow.block.toString(16),
-            from: this.actionData.sender,
-            gas: this.transaction.gasLimit.toString('hex'),
-            gasPrice: this.transaction.gasPrice.toString('hex'),
-            hash: this.receiptRow.hash,
-            input: this.transaction.data.toString('hex'),
-            nonce: this.transaction.nonce.toString('hex'),
-            to: this.transaction.to.toString('hex'),
-            transactionIndex: this.receiptRow.trx_index.toString(16),
-            value: this.transaction.value.toString('hex'),
-            v: this.transaction.v.toString('hex'),
-            r: this.transaction.r.toString('hex'),
-            s: this.transaction.s.toString('hex')
-        })
-    }
-
-    toTransactionReceipt() {
-        return formatTransaction({
-            transactionHash: this.receiptRow.hash,
-            transactionIndex: this.receiptRow.trx_index.toString(16),
-            blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block),
-            blockNumber: this.receiptRow.block.toString(16),
-            from: this.actionData.sender,
-            to: this.transaction.to.toString('hex'),
-            cumulativeGasUsed: this.receiptRow.gasused,
-            gasUsed: this.receiptRow.gasused,
-            contractAddress: this.receiptRow.createdaddr ? this.receiptRow.createdaddr : null,
-            logs: JSON.parse(this.receiptRow.logs || []),
-            logsBloom: LOGS_BLOOM_EMPTY,
-            status: this.receiptRow.status.toString(16)
-        })
-    }
-
-    static blockNumberToHash(num) {
-        return keccak256(num.toString(16)).toString('hex')
-    }
-
-    static async fromHash(rpc, hyperionAxios, telosContract, hash, from, transactionData) {
-        let receiptRows = await rpc.get_table_rows({
-            code: telosContract,
-            scope: telosContract,
-            table: 'receipt',
-            key_type: 'sha256',
-            index_position: 2,
-            lower_bound: hash,
-            upper_bound: hash,
-            limit: 1
-        })
-
-        if (receiptRows.rows.length && receiptRows.rows[0].hash == hash) {
-            let receiptRow = receiptRows.rows[0]
-            let actionData
-            if (!transactionData || !from) {
-                let transactionResult = await hyperionAxios.get(`/v2/history/get_transaction?id=${receiptRow.trxid}`)
-                let action = transactionResult.data.actions.find(action => action.act.account == telosContract && action.act.name == "raw")
-                actionData = action.act.data
-            } else {
-                actionData = {tx: transactionData, sender: from}
-            }
-            return new EVMTransaction(receiptRow, actionData)
-        } else {
-            return null;
-        }
-    }
+  }
 }
 
 function formatTransaction(trx) {
-    let clone = Object.assign({}, trx);
-    let prefixedKeys = [
-      "blockHash", "blockNumber", "from", "cumulativeGasUsed", "gasUsed", "gas",
-      "gasPrice", "hash", "transactionHash", "ramBytesUsed", "contractAddress",
-      "createdAddress", "output", "input", "nonce", "to", "transactionIndex",
-      "value", "v", "r", "s",
-    ];
-    prefixedKeys.forEach((key) => {
-      if (
-        clone.hasOwnProperty(key) &&
-        typeof clone[key] == "string" &&
-        !clone[key].startsWith("0x")
-      )
-        clone[key] = `0x${
-          shouldUpperCaseReturn(key) ? clone[key] : clone[key].toUpperCase()
-        }`;
-    });
-    return clone;
-  }
-  
-  function shouldUpperCaseReturn(keyName) {
-    let upperCaseProps = ["to", "from", "contractAddress"];
-    return upperCaseProps.includes(keyName);
-  }
+  let clone = Object.assign({}, trx)
+  let prefixedKeys = [
+    'blockHash',
+    'blockNumber',
+    'from',
+    'cumulativeGasUsed',
+    'gasUsed',
+    'gas',
+    'gasPrice',
+    'hash',
+    'transactionHash',
+    'ramBytesUsed',
+    'contractAddress',
+    'createdAddress',
+    'output',
+    'input',
+    'nonce',
+    'to',
+    'transactionIndex',
+    'value',
+    'v',
+    'r',
+    's'
+  ]
+  prefixedKeys.forEach(key => {
+    if (
+      clone.hasOwnProperty(key) &&
+      typeof clone[key] == 'string' &&
+      !clone[key].startsWith('0x')
+    )
+      clone[key] = `0x${
+        shouldUpperCaseReturn(key) ? clone[key] : clone[key].toUpperCase()
+      }`
+  })
+  return clone
+}
+
+function shouldUpperCaseReturn(keyName) {
+  let upperCaseProps = ['to', 'from', 'contractAddress']
+  return upperCaseProps.includes(keyName)
+}
 
 module.exports = { EVMTransaction }

@@ -45,7 +45,8 @@ export class TelosEvmApi {
       telosPrivateKeys,
       endpoint,
       telosContract,
-      fetch
+      fetch,
+      chainId
     })
     this.chainId = chainId
     this.ethContract = ethContract
