@@ -70,7 +70,7 @@ const LOGS_BLOOM_EMPTY =
 const { ETH_CHAIN, FORK } = require('./constants')
 
 class EVMTransaction {
-  constructor(receiptRow, actionData) {
+  constructor(receiptRow, actionData, chainId) {
     this.receiptRow = receiptRow
     this.actionData = actionData
     this.chainConfig = Common.forCustomChain(ETH_CHAIN, { chainId }, FORK)
@@ -133,6 +133,7 @@ class EVMTransaction {
 
   static async fromHash(
     rpc,
+    chainId,
     hyperionAxios,
     telosContract,
     hash,
@@ -165,7 +166,7 @@ class EVMTransaction {
       } else {
         actionData = { tx: transactionData, sender: from }
       }
-      return new EVMTransaction(receiptRow, actionData)
+      return new EVMTransaction(receiptRow, actionData, chainId)
     } else {
       return null
     }
