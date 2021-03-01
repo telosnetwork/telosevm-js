@@ -125,7 +125,7 @@ export class TelosApi {
     let trx = new Transaction(`0x${tx}`, { common: this.chainConfig })
     response.eth = {
       transactionHash: trx.hash().toString('hex'),
-      transactionRaw: tx
+      transaction: trx
     }
 
     /*
