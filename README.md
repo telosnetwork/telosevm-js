@@ -12,7 +12,7 @@ npm install @telosnetwork/telosevm-js
 
 ```js
 const { TelosEvmApi } = require('telosevm-js')
-
+const fetch = require('node-fetch') // only for node
 const evmContractAccount = 'evmcontract2'
 const evmNormalAccount = 'evmaccount11'
 const SYSTEM_SYMBOL = 'TLOS'
@@ -33,6 +33,7 @@ const api = new TelosEvmApi({
   // Enter Telos account that EVM is at / will be deployed to
   telosContract: evmContractAccount,
 
+  fetch: fetch,
   // Enter your own private keys (examples provided)
   telosPrivateKeys: [
     // evmcontract2 (EOS7DJzWuEr1Zu36ZX8GXwGsvNNqdGqx8QRs7KPkqCMTxG6MBT1Eu)
