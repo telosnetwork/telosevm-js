@@ -65,7 +65,7 @@ async function main () {
   await api.telos.deposit({ from: evmNormalAccount, quantity: `0.0002 ${SYSTEM_SYMBOL}` })
 
   // Get all data for new address (address, account, nonce, balance, code)
-  const sender = await api.telos.getEthAccountByEosAccount(evmNormalAccount)
+  const sender = await api.telos.getEthAccountByTelosAccount(evmNormalAccount)
   console.log(`${sender.address} (${evmNormalAccount}) Balance:`, sender.balance) // 0.0001 TLOS
   console.log(`${sender.address} (${evmNormalAccount}) Nonce:`, sender.nonce) // 0
 
