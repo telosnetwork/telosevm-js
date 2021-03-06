@@ -31,10 +31,10 @@ const api = new TelosEvmApi({
   ],
 
   // Enter Telos account that EVM is at / will be deployed to
-  tlosContract: evmContractAccount,
+  telosContract: evmContractAccount,
 
   // Enter your own private keys (examples provided)
-  tlosPrivateKeys: [
+  telosPrivateKeys: [
     // evmcontract2 (EOS7DJzWuEr1Zu36ZX8GXwGsvNNqdGqx8QRs7KPkqCMTxG6MBT1Eu)
     '5JACk8gJ98x3AkypbicNQviXzkqAM2wbbE3FtA79icT2Ks4bWws',
     // evmaccount11 (EOS8Z9y2b1GfAkFUQxBTsiu9DJSLebVoU8cpwLAfXcgWDRWg9aM2Q)
