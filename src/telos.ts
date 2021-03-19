@@ -30,6 +30,7 @@ export class TelosApi {
   api: any
   telosContract: string
   chainConfig: any
+  configGasPrice: any
 
   constructor({
     telosPrivateKeys,
@@ -55,6 +56,19 @@ export class TelosApi {
     })
     this.chainConfig = Common.forCustomChain(ETH_CHAIN, { chainId }, FORK)
     this.telosContract = telosContract
+  }
+
+  async getGasPrice() {
+    if (!this.configGasPrice) {
+      const { rows } = await this.getTable({
+        code: this.telosContract,
+        scope: this.telosContract,
+        table: 'config'
+      })
+      this.configGasPrice = rows[0].min_gas_price
+    }
+
+    return this.configGasPrice
   }
 
   /**
