@@ -314,9 +314,10 @@ export class TelosEvmApi {
     rawSign?: boolean
   }) {
     const nonce = await this.telos.getNonce(sender)
+    const gasPrice = await this.telos.getGasPrice()
     const txData = {
       nonce,
-      gasPrice: DEFAULT_GAS_PRICE,
+      gasPrice: gasPrice,
       gasLimit:
         gasLimit !== undefined
           ? `0x${(gasLimit as any).toString(16)}`
