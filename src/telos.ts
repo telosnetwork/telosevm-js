@@ -93,20 +93,23 @@ export class TelosApi {
    * @param {object} args Arguments
    * @param {string} args.account Telos account to interact with EVM
    * @param {string} args.txRaw RLP encoded hex string
-   * @param {string} args.senderThe ETH address of an account if tx is not signed
+   * @param {string} args.sender The ETH address of an account if tx is not signed
    * @returns {Promise<EvmResponse>} EVM receipt and Telos receipt
    */
   async raw({
     account,
     tx,
-    sender
+    sender,
+    ram_payer
   }: {
     account: string
     tx: string
     sender?: string
+    ram_payer?: string
   }) {
     if (tx && tx.startsWith('0x')) tx = tx.substring(2)
     if (sender && sender.startsWith('0x')) sender = sender.substring(2)
+    if (!ram_payer) ram_payer = account
 
     let response: any = {}
     response.telos = await this.transact([
@@ -114,8 +117,9 @@ export class TelosApi {
         account: this.telosContract,
         name: 'raw',
         data: {
-          ram_payer: account,
+          ram_payer,
           tx,
+          print_gas: false,
           sender
         },
         authorization: [{ actor: account, permission: 'active' }]
@@ -152,6 +156,55 @@ export class TelosApi {
   }
 
   /**
+   * Estimates gas used by sending transaction to the EVM
+   *
+   * @param {object} args Arguments
+   * @param {string} args.account Telos account to interact with EVM
+   * @param {string} args.txRaw RLP encoded hex string
+   * @param {string} args.sender The ETH address of an account if tx is not signed
+   * @returns {Promise<string>} Hex encoded output
+   */
+  async estimateGas({
+    account,
+    tx,
+    sender,
+    ram_payer
+  }: {
+    account: string
+    tx: string
+    sender?: string
+    ram_payer?: string
+  }) {
+    if (tx && tx.startsWith('0x')) tx = tx.substring(2)
+    if (sender && sender.startsWith('0x')) sender = sender.substring(2)
+    if (!ram_payer) ram_payer = account
+
+    try {
+      await this.transact([
+        {
+          account: this.telosContract,
+          name: 'raw',
+          data: {
+            ram_payer,
+            print_gas: true,
+            tx,
+            sender
+          },
+          authorization: [{ actor: account, permission: 'active' }]
+        }
+      ])
+    } catch (e) {
+      const error = e.json.error
+      if (error.code !== 3050003) {
+        throw new Error('This node does not have console printing enabled')
+      }
+      const message = error.details[1].message
+      const result = message.replace('pending console output: ', '')
+      return result
+    }
+  }
+
+  /**
    * Sends a non state modifying call to EVM
    *
    * @param {object} args Arguments
@@ -163,14 +216,17 @@ export class TelosApi {
   async call({
     account,
     tx,
-    sender
+    sender,
+    ram_payer
   }: {
     account: string
     tx: string
     sender?: string
+    ram_payer?: string
   }) {
     if (tx && tx.startsWith('0x')) tx = tx.substring(2)
     if (sender && sender.startsWith('0x')) sender = sender.substring(2)
+    if (!ram_payer) ram_payer = account
 
     try {
       await this.transact([
@@ -178,7 +234,8 @@ export class TelosApi {
           account: this.telosContract,
           name: 'call',
           data: {
-            ram_payer: account,
+            ram_payer,
+            print_gas: false,
             tx,
             sender
           },
