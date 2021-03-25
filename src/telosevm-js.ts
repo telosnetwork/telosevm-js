@@ -317,7 +317,7 @@ export class TelosEvmApi {
     const gasPrice = await this.telos.getGasPrice()
     const txData = {
       nonce,
-      gasPrice: gasPrice,
+      gasPrice: `0x${gasPrice.toString(16)}`,
       gasLimit:
         gasLimit !== undefined
           ? `0x${(gasLimit as any).toString(16)}`
@@ -337,6 +337,8 @@ export class TelosEvmApi {
         throw new Error(
           'Signature requested in createEthTx, but no sender provided'
         )
+
+      sender = sender.toLowerCase()
       if (!this.ethPrivateKeys[sender]) {
         console.log(this.ethPrivateKeys)
         throw new Error('No private key provided for ETH address ' + sender)
