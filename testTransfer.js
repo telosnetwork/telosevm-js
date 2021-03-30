@@ -30,10 +30,10 @@ console.log('Starting...')
 
 ;(async () => {
   /*
-  const tlosTransfer = await api.transfer({ rawSign: true, account: 'evmcontract4', sender: '0xf79b834a37f3143f4a73fc3934edac67fd3a01cd', to: '0x1a5930aD7CC2afAD2e4c4565FF7A6b19bd9DDaA8', quantity: `0.0100 TLOS` }, {gasLimit: 100000000})
+  const tlosTransfer = await api.transfer({ rawSign: false, account: 'evmcontract4', sender: '0xf79b834a37f3143f4a73fc3934edac67fd3a01cd', to: '0x1a5930aD7CC2afAD2e4c4565FF7A6b19bd9DDaA8', quantity: `0.0100 TLOS` }, {gasLimit: 100000000})
   console.dir(tlosTransfer)
   */
-  const tlosTransfer = await api.transfer({ returnRaw: true, rawSign: true, account: 'evmcontract4', sender: '0xf79b834a37f3143f4a73fc3934edac67fd3a01cd', to: '0x1a5930aD7CC2afAD2e4c4565FF7A6b19bd9FDaA8', quantity: `0.0100 TLOS` }, {gasLimit: 100000000})
+  const tlosTransfer = await api.transfer({ returnRaw: true, rawSign: false, account: 'evmcontract4', sender: '0xf79b834a37f3143f4a73fc3934edac67fd3a01cd', to: '0x1a5930aD7CC2afAD2e4c4565FF7A6b19bd9FDaA8', quantity: `0.0100 TLOS` }, {gasLimit: 100000000})
   const tlosGas = await api.telos.estimateGas({account: 'evmcontract4', sender: '0xf79b834a37f3143f4a73fc3934edac67fd3a01cd', tx: tlosTransfer});
   console.log(parseInt(tlosGas, 16));
 })()
