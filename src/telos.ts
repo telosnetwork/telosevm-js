@@ -213,7 +213,7 @@ export class TelosApi {
         throw new Error('This node does not have console printing enabled')
       }
       const message = error.details[1].message
-      const result = message.replace('pending console output: ', '')
+      const result = message.match(/(0[xX][0-9a-fA-F]+)$/)[0]
       return result
     }
   }
@@ -262,7 +262,7 @@ export class TelosApi {
         throw new Error('This node does not have console printing enabled')
       }
       const message = error.details[1].message
-      const result = message.replace('pending console output: ', '')
+      const result = message.match(/(0[xX][0-9a-fA-F]+)$/)[0]
       return result
     }
   }
