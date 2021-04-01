@@ -15,6 +15,7 @@ export const ENDPOINTS: any = {
 }
 
 export const EOSIO_TOKEN = 'eosio.token'
+export const EOSIO_SYSTEM = 'eosio'
 export const EOSIO_TOKEN_PRECISION = 4
 export const ETH_CHAIN = 'mainnet'
 export const FORK = 'istanbul'

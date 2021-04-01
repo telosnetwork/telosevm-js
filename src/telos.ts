@@ -31,6 +31,7 @@ export class TelosApi {
   telosContract: string
   chainConfig: any
   configGasPrice: any
+  debug: boolean
 
   constructor({
     telosPrivateKeys,
@@ -56,6 +57,11 @@ export class TelosApi {
     })
     this.chainConfig = Common.forCustomChain(ETH_CHAIN, { chainId }, FORK)
     this.telosContract = telosContract
+    this.debug = false
+  }
+
+  setDebug(b: boolean) {
+    this.debug = b
   }
 
   async getGasPrice() {
@@ -90,6 +96,17 @@ export class TelosApi {
           sign: true
         }
       )
+      if (this.debug) {
+        try {
+          result.processed.action_traces.forEach((trace: any) => {
+            console.log(trace.console)
+          })
+        } catch (e) {
+          console.error(
+            `Failed to log result: ${e.message}\nResult:${console.dir(result)}`
+          )
+        }
+      }
       return result
     } catch (e) {
       // if (e.json) {
