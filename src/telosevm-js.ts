@@ -23,6 +23,7 @@ export class TelosEvmApi {
   eth: any
   ethContract: string | undefined
   telos: TelosApi
+  debug: boolean
 
   constructor({
     ethPrivateKeys,
@@ -51,6 +52,7 @@ export class TelosEvmApi {
     this.chainId = chainId
     this.ethContract = ethContract
     this.chainConfig = Common.forCustomChain(ETH_CHAIN, { chainId }, FORK)
+    this.debug = false
 
     this.ethPrivateKeys = ethPrivateKeys.reduce(
       (acc: any, privateKey: string) => {
@@ -64,6 +66,11 @@ export class TelosEvmApi {
       },
       {}
     )
+  }
+
+  setDebug(b: boolean) {
+    this.debug = b
+    this.telos.setDebug(b)
   }
 
   /**
@@ -266,7 +273,7 @@ export class TelosEvmApi {
     const [amount, symbol] = quantity.split(' ')
     if (symbol !== DEFAULT_SYMBOL)
       throw new Error(
-        'Must provide asset as quantity to transfer like 0.0001 SYS'
+        'Must provide asset as quantity to transfer like 0.0001 TLOS'
       )
     if (!sender) throw new Error('Must provide sender to transfer function')
 
