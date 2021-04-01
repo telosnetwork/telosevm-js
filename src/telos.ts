@@ -103,17 +103,23 @@ export class TelosApi {
           })
         } catch (e) {
           console.error(
-            `Failed to log result: ${e.message}\nResult:${console.dir(result)}`
+            `Failed to log result: ${e.message}\nResult:${console.dir(result, {
+              depth: null
+            })}`
           )
         }
       }
       return result
     } catch (e) {
-      // if (e.json) {
-      //   console.log(e.json.error.details[0].message)
-      // } else {
-      //   console.dir(e, { depth: null })
-      // }
+      if (this.debug) {
+        if (e.json) {
+          e.json.error.details.forEach((detail: any) => {
+            console.log(detail.message)
+          })
+        } else {
+          console.dir(e, { depth: null })
+        }
+      }
       throw e
     }
   }
