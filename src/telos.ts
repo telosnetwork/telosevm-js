@@ -156,7 +156,7 @@ export class TelosApi {
         data: {
           ram_payer,
           tx,
-          print_gas: false,
+          estimate_gas: false,
           sender
         },
         authorization: [{ actor: account, permission: 'active' }]
@@ -223,7 +223,7 @@ export class TelosApi {
           name: 'raw',
           data: {
             ram_payer,
-            print_gas: true,
+            estimate_gas: true,
             tx,
             sender
           },
@@ -272,7 +272,7 @@ export class TelosApi {
           name: 'call',
           data: {
             ram_payer,
-            print_gas: false,
+            estimate_gas: false,
             tx,
             sender
           },
