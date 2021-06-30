@@ -61,8 +61,8 @@ transactions: Array - Array of transaction objects, or 32 Bytes transaction hash
 uncles: Array - Array of uncle hashes.
 */
 
-const { Transaction } = require('ethereumjs-tx')
-const Common = require('ethereumjs-common')
+const { Transaction } = require('@ethereumjs/tx')
+const Common = require('@ethereumjs/common')
 const { keccak256 } = require('ethereumjs-util')
 const { TextEncoder } = require('text-encoding')
 const LOGS_BLOOM_EMPTY =
