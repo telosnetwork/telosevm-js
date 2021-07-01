@@ -13,7 +13,7 @@ import {
   DEFAULT_VALUE,
   DEFAULT_SYMBOL
 } from './constants'
-const abiEncoder = require('ethereumjs-abi')
+import abiEncoder from 'ethereumjs-abi'
 
 export class TelosEvmApi {
   ethPrivateKeys: any
@@ -222,7 +222,7 @@ export class TelosEvmApi {
 
       // Encode params
       const params = abiEncoder.rawEncode(types, args).toString('hex')
-      const data = `0x${bytecodeObject}${params.toString('hex')}`
+      const data = `0x${bytecodeObject}${params}`
 
       // Create transaction and send it
       const txParams = Object.assign({ data, to: undefined }, overrides)
