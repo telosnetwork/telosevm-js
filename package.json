@@ -1,6 +1,6 @@
 {
   "name": "@telosnetwork/telosevm-js",
-  "version": "0.1.1-9",
+  "version": "0.1.1-10",
   "description": "Telos EVM JS SDK",
   "keywords": [],
   "main": "dist/telosevm-js.umd.js",
