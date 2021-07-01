@@ -3,8 +3,9 @@ import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 import { TextEncoder, TextDecoder } from 'text-encoding'
 import { EOSIO_TOKEN } from './constants'
 import { Account } from './interfaces'
-import { Transaction } from 'ethereumjs-tx'
-import Common from 'ethereumjs-common'
+import * as ethTx from '@ethereumjs/tx'
+const { Transaction } = ethTx
+import Common from '@ethereumjs/common'
 import { ETH_CHAIN, FORK } from './constants'
 
 const BN = require('bn.js')
@@ -163,7 +164,9 @@ export class TelosApi {
       }
     ])
 
-    let trx = new Transaction(`0x${tx}`, { common: this.chainConfig })
+    let trx = Transaction.fromSerializedTx(Buffer.from(`0x${tx}`, 'hex'), {
+      common: this.chainConfig
+    })
     response.eth = {
       transactionHash: trx.hash().toString('hex'),
       transaction: trx,

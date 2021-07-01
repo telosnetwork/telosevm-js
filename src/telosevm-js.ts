@@ -1,5 +1,6 @@
-import { Transaction } from 'ethereumjs-tx'
-import Common from 'ethereumjs-common'
+import * as ethTx from '@ethereumjs/tx'
+const { Transaction } = ethTx
+import Common from '@ethereumjs/common'
 import { privateToAddress } from 'ethereumjs-util'
 import { TelosApi } from './telos'
 export * from './transaction'
