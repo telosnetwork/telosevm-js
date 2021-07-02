@@ -3,7 +3,7 @@ const { Transaction } = ethTx
 import Common from '@ethereumjs/common'
 import { privateToAddress } from 'ethereumjs-util'
 import { TelosApi } from './telos'
-export * from './transaction'
+export { EVMTransaction } from './transaction'
 import {
   ETH_CHAIN,
   FORK,
@@ -276,12 +276,14 @@ export class TelosEvmApi {
         'Must provide asset as quantity to transfer like 0.0001 TLOS'
       )
     if (!sender) throw new Error('Must provide sender to transfer function')
+    if (!amount)
+        throw new Error('Amount is invalid');
 
     const params = Object.assign(
       {
         sender,
         to,
-        value: +amount * Math.pow(10, TLOS_TO_WEI_CONVERSION),
+        value: parseFloat(amount) * Math.pow(10, TLOS_TO_WEI_CONVERSION),
         rawSign
       },
       overrides

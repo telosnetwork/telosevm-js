@@ -43,3 +43,7 @@ export interface EvmResponse {
   eth: EvmReceipt
   tlos: any
 }
+
+export interface Transaction {
+  
+}

@@ -17,6 +17,9 @@ r: DATA, 32 Bytes - ECDSA signature r
 s: DATA, 32 Bytes - ECDSA signature s
 */
 
+import { AxiosInstance } from "axios"
+import { JsonRpc } from "eosjs"
+
 /* eth_getTransactionReceipt
 Object - A transaction receipt object, or null when no receipt was found:
 
@@ -61,21 +64,24 @@ transactions: Array - Array of transaction objects, or 32 Bytes transaction hash
 uncles: Array - Array of uncle hashes.
 */
 
-const ethTx = require('@ethereumjs/tx')
-const { Transaction } = ethTx
-const Common = require('@ethereumjs/common')
-const { keccak256 } = require('ethereumjs-util')
-const { TextEncoder } = require('text-encoding')
+import { Transaction } from '@ethereumjs/tx'
+import Common from '@ethereumjs/common'
+import { keccak256 } from 'ethereumjs-util'
 const LOGS_BLOOM_EMPTY =
   '0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
-const { ETH_CHAIN, FORK } = require('./constants')
+import { ETH_CHAIN, FORK } from './constants'
 
-class EVMTransaction {
-  constructor(receiptRow, actionData, chainId) {
+export class EVMTransaction {
+  receiptRow: any
+  actionData: any
+  chainConfig: any
+  transaction: Transaction
+
+  constructor(receiptRow: any, actionData: any, chainId: any) {
     this.receiptRow = receiptRow
     this.actionData = actionData
     this.chainConfig = Common.forCustomChain(ETH_CHAIN, { chainId }, FORK)
-    this.transaction = new Transaction(`0x${actionData.tx.toLowerCase()}`,  { common: this.chainConfig })
+    this.transaction = Transaction.fromSerializedTx(Buffer.from(`0x${actionData.tx.toLowerCase()}`),  { common: this.chainConfig })
   }
 
   getBlockNumber() {
@@ -100,12 +106,12 @@ class EVMTransaction {
       hash: this.receiptRow.hash,
       input: this.transaction.data.toString('hex'),
       nonce: this.transaction.nonce.toString('hex'),
-      to: this.transaction.to.toString('hex'),
+      to: this.transaction.to?.toBuffer().toString('hex'),
       transactionIndex: this.receiptRow.trx_index.toString(16),
       value: this.transaction.value.toString('hex'),
-      v: this.transaction.v.toString('hex'),
-      r: this.transaction.r.toString('hex'),
-      s: this.transaction.s.toString('hex')
+      v: this.transaction.v?.toString('hex'),
+      r: this.transaction.r?.toString('hex'),
+      s: this.transaction.s?.toString('hex')
     })
   }
 
@@ -116,7 +122,7 @@ class EVMTransaction {
       blockHash: EVMTransaction.blockNumberToHash(this.receiptRow.block),
       blockNumber: this.receiptRow.block.toString(16),
       from: this.actionData.sender,
-      to: this.transaction.to.toString('hex'),
+      to: this.transaction.to?.toBuffer().toString('hex'),
       cumulativeGasUsed: this.receiptRow.gasused,
       gasUsed: this.receiptRow.gasused,
       contractAddress: this.receiptRow.createdaddr
@@ -128,18 +134,18 @@ class EVMTransaction {
     })
   }
 
-  static blockNumberToHash(num) {
+  static blockNumberToHash(num: number) {
     return keccak256(num.toString(16)).toString('hex')
   }
 
   static async fromHash(
-    rpc,
-    chainId,
-    hyperionAxios,
-    telosContract,
-    hash,
-    from,
-    transactionData
+    rpc: JsonRpc,
+    chainId: any,
+    hyperionAxios: AxiosInstance,
+    telosContract: any,
+    hash: any,
+    from: any,
+    transactionData: any
   ) {
     let receiptRows = await rpc.get_table_rows({
       code: telosContract,
@@ -160,7 +166,7 @@ class EVMTransaction {
           `/v2/history/get_transaction?id=${receiptRow.trxid}`
         )
         let action = transactionResult.data.actions.find(
-          action =>
+          (action: any) =>
             action.act.account == telosContract && action.act.name == 'raw'
         )
         actionData = action.act.data
@@ -174,7 +180,7 @@ class EVMTransaction {
   }
 }
 
-function formatTransaction(trx) {
+function formatTransaction(trx: any) {
   let clone = Object.assign({}, trx)
   let prefixedKeys = [
     'blockHash',
@@ -212,9 +218,7 @@ function formatTransaction(trx) {
   return clone
 }
 
-function shouldUpperCaseReturn(keyName) {
+function shouldUpperCaseReturn(keyName: string) {
   let upperCaseProps = ['to', 'from', 'contractAddress']
   return upperCaseProps.includes(keyName)
 }
-
-module.exports = { EVMTransaction }
