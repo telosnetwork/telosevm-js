@@ -144,6 +144,10 @@ export class TelosApi {
     if (sender && sender.startsWith('0x')) sender = sender.substring(2)
     if (!ram_payer) ram_payer = account
 
+    if (this.debug) {
+      console.log(`In raw, tx is: ${tx}`)
+    }
+
     let response: any = {}
     response.telos = await this.transact([
       {
@@ -159,9 +163,14 @@ export class TelosApi {
       }
     ])
 
+    if (this.debug) {
+      console.log(`In raw, console is: ${response.telos.processed.action_traces[0].console}`)
+    }
+
     let trx = Transaction.fromSerializedTx(Buffer.from(`0x${tx}`, 'hex'), {
       common: this.chainConfig
     })
+
     response.eth = {
       transactionHash: trx.hash().toString('hex'),
       transaction: trx,
