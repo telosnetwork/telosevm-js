@@ -3,7 +3,8 @@
   "version": "0.1.1-17",
   "description": "Telos EVM JS SDK",
   "keywords": [],
-  "main": "lib/esm/telosevm-js.js",
+  "main": "lib/cjs/telosevm-js.js",
+  "module": "lib/esm/telosevm-js.js",
   "engines": {
     "node": ">=14"
   },
