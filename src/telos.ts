@@ -167,7 +167,7 @@ export class TelosApi {
       console.log(`In raw, console is: ${response.telos.processed.action_traces[0].console}`)
     }
 
-    let trx = Transaction.fromSerializedTx(Buffer.from(`0x${tx}`, 'hex'), {
+    let trx = Transaction.fromSerializedTx(Buffer.from(tx, 'hex'), {
       common: this.chainConfig
     })
 
