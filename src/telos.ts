@@ -15,6 +15,11 @@ const transformEthAccount = (account: Account) => {
   account.balance = new BN(account.balance, 16)._strip()
   return account
 }
+interface RevertError extends Error {
+  evmCallOutput: string
+}
+
+class RevertError extends Error { 
 
 /**
  * Telos API used as a subset of EosEvmApi
@@ -293,6 +298,15 @@ export class TelosApi {
       }
       const message = error.details[1].message
       const result = message.match(/(0[xX][0-9a-fA-F]*)$/)[0]
+      const REVERT = "REVERT";
+      const revertLength = REVERT.length;
+      const startResult = message.length - result.length;
+      const beforeResult = message.substring((startResult - revertLength), startResult);
+      if (beforeResult == REVERT) {
+        const err = new RevertError("Transaction reverted");
+        err.evmCallOutput = result;
+        throw err;
+      }
       return result
     }
   }
