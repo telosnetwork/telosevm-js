@@ -19,7 +19,7 @@ interface RevertError extends Error {
   evmCallOutput: string
 }
 
-class RevertError extends Error { 
+class RevertError extends Error { }
 
 /**
  * Telos API used as a subset of EosEvmApi
