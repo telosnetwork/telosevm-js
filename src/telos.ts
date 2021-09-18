@@ -82,10 +82,14 @@ export class TelosApi {
    * Bundles actions into a transaction to send to Telos Api
    *
    * @param {any[]} actionsFull Telos actions
+   * @param {Api} api An optional Api instance to use for sending the transaction
    * @returns {Promise<any>} EVM receipt and Telos receipt
    */
-  async transact(actions: any[]) {
+  async transact(actions: any[], api?: Api) {
     try {
+      if (!api)
+        api = this.api
+
       const result = await this.api.transact(
         {
           actions
@@ -138,12 +142,14 @@ export class TelosApi {
     account,
     tx,
     sender,
-    ram_payer
+    ram_payer,
+    api
   }: {
     account: string
     tx: string
     sender?: string
     ram_payer?: string
+    api?: Api
   }) {
     if (tx && tx.startsWith('0x')) tx = tx.substring(2)
     if (sender && sender.startsWith('0x')) sender = sender.substring(2)
@@ -166,7 +172,7 @@ export class TelosApi {
         },
         authorization: [{ actor: account, permission: 'active' }]
       }
-    ])
+    ], api)
 
     if (this.debug) {
       console.log(`In raw, console is: ${response.telos.processed.action_traces[0].console}`)
@@ -211,18 +217,21 @@ export class TelosApi {
    * @param {string} args.account Telos account to interact with EVM
    * @param {string} args.txRaw RLP encoded hex string
    * @param {string} args.sender The ETH address of an account if tx is not signed
+   * @param {Api} api An optional Api instance to use for sending the transaction
    * @returns {Promise<string>} Hex encoded output
    */
   async estimateGas({
     account,
     tx,
     sender,
-    ram_payer
+    ram_payer,
+    api
   }: {
     account: string
     tx: string
     sender?: string
     ram_payer?: string
+    api?: Api
   }) {
     if (tx && tx.startsWith('0x')) tx = tx.substring(2)
     if (sender && sender.startsWith('0x')) sender = sender.substring(2)
@@ -241,7 +250,7 @@ export class TelosApi {
           },
           authorization: [{ actor: account, permission: 'active' }]
         }
-      ])
+      ], api)
     } catch (e) {
       const error = e.json.error
       if (error.code !== 3050003) {
@@ -260,18 +269,21 @@ export class TelosApi {
    * @param {string} args.account Telos account to interact with EVM
    * @param {string} args.txRaw RLP encoded hex string
    * @param {string} args.senderThe ETH address of an account if tx is not signed
+   * @param {Api} api An optional Api instance to use for sending the transaction
    * @returns {Promise<string>} Hex encoded output
    */
   async call({
     account,
     tx,
     sender,
-    ram_payer
+    ram_payer,
+    api
   }: {
     account: string
     tx: string
     sender?: string
     ram_payer?: string
+    api?: Api
   }) {
     if (tx && tx.startsWith('0x')) tx = tx.substring(2)
     if (sender && sender.startsWith('0x')) sender = sender.substring(2)
@@ -290,7 +302,7 @@ export class TelosApi {
           },
           authorization: [{ actor: account, permission: 'active' }]
         }
-      ])
+      ], api)
     } catch (e) {
       const error = e.json.error
       if (error.code !== 3050003) {
