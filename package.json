@@ -65,7 +65,7 @@
     "axios": "^0.21.1",
     "bn.js": "^5.1.1",
     "buffer": "^6.0.3",
-    "eosjs": "^21.0.3",
+    "eosjs": "^22.1.0",
     "ethereumjs-abi": "^0.6.8",
     "ethereumjs-util": "^6.2.0",
     "node-fetch": "^2.6.0",
