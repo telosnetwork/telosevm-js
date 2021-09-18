@@ -4,6 +4,7 @@ import Common from '@ethereumjs/common'
 import { privateToAddress } from 'ethereumjs-util'
 import { TelosApi } from './telos'
 export { EVMTransaction } from './transaction'
+export { TransactionVars } from './telos'
 import {
   ETH_CHAIN,
   FORK,
