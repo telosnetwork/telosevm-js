@@ -19,6 +19,12 @@ interface RevertError extends Error {
   evmCallOutput: string
 }
 
+interface TransactionVars {
+  expiration: string
+  ref_block_num: number
+  ref_block_prefix: number
+}
+
 class RevertError extends Error { }
 
 /**
@@ -85,21 +91,31 @@ export class TelosApi {
    * @param {Api} api An optional Api instance to use for sending the transaction
    * @returns {Promise<any>} EVM receipt and Telos receipt
    */
-  async transact(actions: any[], api?: Api) {
+  async transact(actions: any[], api?: Api, trxVars?: TransactionVars) {
     try {
       if (!api)
         api = this.api
 
+      let trx: any = {
+        actions
+      }
+
+      let trxOpts: any = {
+        broadcast: true,
+        sign: true
+      }
+
+      if (trxVars) {
+        trx.ref_block_num = trxVars.ref_block_num
+        trx.ref_block_prefix = trxVars.ref_block_prefix
+        trx.expiration = trxVars.expiration
+      } else {
+        trxOpts.blocksBehind = 3
+        trxOpts.expireSeconds = 3000
+      }
+
       const result = await this.api.transact(
-        {
-          actions
-        },
-        {
-          blocksBehind: 3,
-          expireSeconds: 3000,
-          broadcast: true,
-          sign: true
-        }
+        trx, trxOpts
       )
       if (this.debug) {
         try {
@@ -143,13 +159,15 @@ export class TelosApi {
     tx,
     sender,
     ram_payer,
-    api
+    api,
+    trxVars
   }: {
     account: string
     tx: string
     sender?: string
     ram_payer?: string
     api?: Api
+    trxVars?: TransactionVars
   }) {
     if (tx && tx.startsWith('0x')) tx = tx.substring(2)
     if (sender && sender.startsWith('0x')) sender = sender.substring(2)
@@ -172,7 +190,7 @@ export class TelosApi {
         },
         authorization: [{ actor: account, permission: 'active' }]
       }
-    ], api)
+    ], api, trxVars)
 
     if (this.debug) {
       console.log(`In raw, console is: ${response.telos.processed.action_traces[0].console}`)
@@ -225,13 +243,15 @@ export class TelosApi {
     tx,
     sender,
     ram_payer,
-    api
+    api,
+    trxVars
   }: {
     account: string
     tx: string
     sender?: string
     ram_payer?: string
     api?: Api
+    trxVars?: TransactionVars
   }) {
     if (tx && tx.startsWith('0x')) tx = tx.substring(2)
     if (sender && sender.startsWith('0x')) sender = sender.substring(2)
@@ -250,7 +270,7 @@ export class TelosApi {
           },
           authorization: [{ actor: account, permission: 'active' }]
         }
-      ], api)
+      ], api, trxVars)
     } catch (e) {
       const error = e.json.error
       if (error.code !== 3050003) {
@@ -277,13 +297,15 @@ export class TelosApi {
     tx,
     sender,
     ram_payer,
-    api
+    api,
+    trxVars
   }: {
     account: string
     tx: string
     sender?: string
     ram_payer?: string
     api?: Api
+    trxVars?: TransactionVars
   }) {
     if (tx && tx.startsWith('0x')) tx = tx.substring(2)
     if (sender && sender.startsWith('0x')) sender = sender.substring(2)
@@ -302,7 +324,7 @@ export class TelosApi {
           },
           authorization: [{ actor: account, permission: 'active' }]
         }
-      ], api)
+      ], api, trxVars)
     } catch (e) {
       const error = e.json.error
       if (error.code !== 3050003) {
