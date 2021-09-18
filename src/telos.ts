@@ -19,7 +19,7 @@ interface RevertError extends Error {
   evmCallOutput: string
 }
 
-interface TransactionVars {
+export interface TransactionVars {
   expiration: string
   ref_block_num: number
   ref_block_prefix: number
