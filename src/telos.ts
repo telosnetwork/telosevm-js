@@ -75,6 +75,15 @@ export class TelosApi {
     this.debug = b
   }
 
+  throwError(error: any, defaultMessage: string) {
+    let errorMessage = defaultMessage
+    const assertionPrefix = `assertion failure with message:`;
+    if (error.details[0].startsWith(assertionPrefix))
+      errorMessage = error.details[0].substring(assertionPrefix.length)
+
+    throw new Error(errorMessage)
+  }
+
   async getGasPrice() {
     const { rows } = await this.getTable({
       code: this.telosContract,
@@ -122,7 +131,7 @@ export class TelosApi {
           result.processed.action_traces.forEach((trace: any) => {
             console.log(trace.console)
           })
-        } catch (e) {
+        } catch (e: any) {
           console.error(
             `Failed to log result: ${e.message}\nResult:${console.dir(result, {
               depth: null
@@ -131,7 +140,7 @@ export class TelosApi {
         }
       }
       return result
-    } catch (e) {
+    } catch (e: any) {
       if (this.debug) {
         if (e.json) {
           e.json.error.details.forEach((detail: any) => {
@@ -271,14 +280,19 @@ export class TelosApi {
           authorization: [{ actor: account, permission: 'active' }]
         }
       ], api, trxVars)
-    } catch (e) {
+    } catch (e: any) {
       const error = e.json.error
       if (error.code !== 3050003) {
         throw new Error('This node does not have console printing enabled')
       }
+      // TODO: there isn't always pending console output, so accessing message.match(/(0[xX][0-9a-fA-F]*)$/)[0] will fail, the real error message is somewhere else in the error, see example:
       const message = error.details[1].message
       const result = message.match(/(0[xX][0-9a-fA-F]*)$/)[0]
-      return result
+      if (result)
+        return result
+      
+      let defaultMessage = `Server Error: Failed to estimate gas`
+      this.throwError(error, defaultMessage)
     }
   }
 
@@ -325,7 +339,7 @@ export class TelosApi {
           authorization: [{ actor: account, permission: 'active' }]
         }
       ], api, trxVars)
-    } catch (e) {
+    } catch (e: any) {
       const error = e.json.error
       if (error.code !== 3050003) {
         throw new Error('This node does not have console printing enabled')
@@ -341,7 +355,11 @@ export class TelosApi {
         err.evmCallOutput = result;
         throw err;
       }
-      return result
+      if (result)
+        return result;
+
+      let defaultMessage = `Server Error: Error during call`
+      this.throwError(error, defaultMessage)
     }
   }
 
