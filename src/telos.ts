@@ -287,9 +287,9 @@ export class TelosApi {
       }
       // TODO: there isn't always pending console output, so accessing message.match(/(0[xX][0-9a-fA-F]*)$/)[0] will fail, the real error message is somewhere else in the error, see example:
       const message = error.details[1].message
-      const result = message.match(/(0[xX][0-9a-fA-F]*)$/)[0]
+      const result = message.match(/(0[xX][0-9a-fA-F]*)$/)
       if (result)
-        return result
+        return result[0]
       
       let defaultMessage = `Server Error: Failed to estimate gas`
       this.throwError(error, defaultMessage)
@@ -345,18 +345,21 @@ export class TelosApi {
         throw new Error('This node does not have console printing enabled')
       }
       const message = error.details[1].message
-      const result = message.match(/(0[xX][0-9a-fA-F]*)$/)[0]
-      const REVERT = "REVERT";
-      const revertLength = REVERT.length;
-      const startResult = message.length - result.length;
-      const beforeResult = message.substring((startResult - revertLength), startResult);
-      if (beforeResult == REVERT) {
-        const err = new RevertError("Transaction reverted");
-        err.evmCallOutput = result;
-        throw err;
-      }
-      if (result)
+      const resultMatch = message.match(/(0[xX][0-9a-fA-F]*)$/)
+      if (resultMatch) {
+        const result = resultMatch[0];
+        const REVERT = "REVERT";
+        const revertLength = REVERT.length;
+        const startResult = message.length - result.length;
+        const beforeResult = message.substring((startResult - revertLength), startResult);
+        if (beforeResult == REVERT) {
+          const err = new RevertError("Transaction reverted");
+          err.evmCallOutput = result;
+          throw err;
+        }
+
         return result;
+      }
 
       let defaultMessage = `Server Error: Error during call`
       this.throwError(error, defaultMessage)
