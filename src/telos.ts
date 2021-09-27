@@ -78,8 +78,8 @@ export class TelosApi {
   throwError(error: any, defaultMessage: string) {
     let errorMessage = defaultMessage
     const assertionPrefix = `assertion failure with message:`;
-    if (error.details[0].startsWith(assertionPrefix))
-      errorMessage = error.details[0].substring(assertionPrefix.length)
+    if (error.details[0].message.startsWith(assertionPrefix))
+      errorMessage = error.details[0].message.substring(assertionPrefix.length)
 
     throw new Error(errorMessage)
   }
