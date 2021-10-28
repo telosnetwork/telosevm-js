@@ -38,6 +38,7 @@ class RevertError extends Error { }
 export class TelosApi {
   telosPrivateKeys: Array<string>
   signatureProvider: any
+  signingPermission: string
   rpc: any
   api: any
   telosContract: string
@@ -46,12 +47,14 @@ export class TelosApi {
 
   constructor({
     telosPrivateKeys,
+    signingPermission,
     endpoint,
     telosContract,
     fetch,
     chainId
   }: {
     telosPrivateKeys: Array<string>
+    signingPermission?: string
     endpoint: string
     telosContract: string
     fetch: any
@@ -59,6 +62,7 @@ export class TelosApi {
   }) {
     this.telosPrivateKeys = telosPrivateKeys
     this.signatureProvider = new JsSignatureProvider(this.telosPrivateKeys)
+    this.signingPermission = signingPermission || 'active'
     this.rpc = new JsonRpc(endpoint, { fetch: fetch as any })
     this.api = new Api({
       rpc: this.rpc,
@@ -197,7 +201,7 @@ export class TelosApi {
           estimate_gas: false,
           sender
         },
-        authorization: [{ actor: account, permission: 'active' }]
+        authorization: [{ actor: account, permission: this.signingPermission }]
       }
     ], api, trxVars)
 
@@ -277,7 +281,7 @@ export class TelosApi {
             tx,
             sender
           },
-          authorization: [{ actor: account, permission: 'active' }]
+          authorization: [{ actor: account, permission: this.signingPermission }]
         }
       ], api, trxVars)
     } catch (e: any) {
@@ -336,7 +340,7 @@ export class TelosApi {
             tx,
             sender
           },
-          authorization: [{ actor: account, permission: 'active' }]
+          authorization: [{ actor: account, permission: this.signingPermission }]
         }
       ], api, trxVars)
     } catch (e: any) {
@@ -383,7 +387,7 @@ export class TelosApi {
           account,
           data
         },
-        authorization: [{ actor: account, permission: 'active' }]
+        authorization: [{ actor: account, permission: this.signingPermission }]
       }
     ])
   }
@@ -405,7 +409,7 @@ export class TelosApi {
           to: account,
           quantity
         },
-        authorization: [{ actor: account, permission: 'active' }]
+        authorization: [{ actor: account, permission: this.signingPermission }]
       }
     ])
   }
@@ -438,7 +442,7 @@ export class TelosApi {
           quantity,
           memo
         },
-        authorization: [{ actor: from, permission: 'active' }]
+        authorization: [{ actor: from, permission: this.signingPermission }]
       }
     ])
   }
@@ -454,7 +458,7 @@ export class TelosApi {
         account: this.telosContract,
         name: 'clearall',
         data: {},
-        authorization: [{ actor: this.telosContract, permission: 'active' }]
+        authorization: [{ actor: this.telosContract, permission: this.signingPermission }]
       }
     ])
   }

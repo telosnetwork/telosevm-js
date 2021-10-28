@@ -29,6 +29,7 @@ export class TelosEvmApi {
   constructor({
     ethPrivateKeys,
     telosPrivateKeys,
+    signingPermission,
     endpoint,
     telosContract,
     ethContract,
@@ -37,6 +38,7 @@ export class TelosEvmApi {
   }: {
     ethPrivateKeys?: any
     telosPrivateKeys: string[]
+    signingPermission?: string
     endpoint: string
     telosContract: string
     ethContract?: string
@@ -45,6 +47,7 @@ export class TelosEvmApi {
   }) {
     this.telos = new TelosApi({
       telosPrivateKeys,
+      signingPermission,
       endpoint,
       telosContract,
       fetch,
