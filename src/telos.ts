@@ -312,12 +312,12 @@ export class TelosApi {
 
       if (result) {
         if (!receipt.gasused) {
-          return `0x${result[0]}`
+          return result[0]
         }
 
         let resultInt = parseInt(result[0], 16);
         let receiptInt = parseInt(receipt.gasused, 16);
-        return receiptInt > resultInt ? `0x${receipt.gasused}` : `0x${result[0]}`;
+        return receiptInt > resultInt ? `0x${receipt.gasused}` : result[0];
       } else {
         if (receipt.gasused) {
           return `0x${receipt.gasused}`
