@@ -305,9 +305,8 @@ export class TelosApi {
       let receipt;
       try {
         receipt = JSON.parse(receiptLog);
-        console.log(`Receipt: ${JSON.stringify(receipt)}`);
       } catch (e) {
-        console.log('WARNING: Failed to parse receiptLog');
+        console.log('WARNING: Failed to parse receiptLog in estimate gas');
       }
 
       if (result) {
