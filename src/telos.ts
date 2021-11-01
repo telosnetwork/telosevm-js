@@ -10,6 +10,9 @@ import { ETH_CHAIN, FORK } from './constants'
 
 const BN = require('bn.js')
 
+const RECEIPT_LOG_START = "RCPT{{";
+const RECEIPT_LOG_END = "}}RCPT";
+
 const transformEthAccount = (account: Account) => {
   account.address = `0x${account.address}`
   account.balance = new BN(account.balance, 16)._strip()
@@ -251,6 +254,7 @@ export class TelosApi {
    * @param {Api} api An optional Api instance to use for sending the transaction
    * @returns {Promise<string>} Hex encoded output
    */
+  // @ts-ignore
   async estimateGas({
     account,
     tx,
@@ -292,9 +296,34 @@ export class TelosApi {
       // TODO: there isn't always pending console output, so accessing message.match(/(0[xX][0-9a-fA-F]*)$/)[0] will fail, the real error message is somewhere else in the error, see example:
       const message = error.details[1].message
       const result = message.match(/(0[xX][0-9a-fA-F]*)$/)
-      if (result)
-        return result[0]
-      
+
+      let receiptLog = message.slice(
+          message.indexOf(RECEIPT_LOG_START) + RECEIPT_LOG_START.length,
+          message.indexOf(RECEIPT_LOG_END)
+      );
+
+      let receipt;
+      try {
+        receipt = JSON.parse(receiptLog);
+        console.log(`Receipt: ${JSON.stringify(receipt)}`);
+      } catch (e) {
+        console.log('WARNING: Failed to parse receiptLog');
+      }
+
+      if (result) {
+        if (!receipt.gasused) {
+          return `0x${result[0]}`
+        }
+
+        let resultInt = parseInt(result[0], 16);
+        let receiptInt = parseInt(receipt.gasused, 16);
+        return receiptInt > resultInt ? `0x${receipt.gasused}` : `0x${result[0]}`;
+      } else {
+        if (receipt.gasused) {
+          return `0x${receipt.gasused}`
+        }
+      }
+
       let defaultMessage = `Server Error: Failed to estimate gas`
       this.throwError(error, defaultMessage)
     }
