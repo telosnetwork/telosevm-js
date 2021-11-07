@@ -544,7 +544,7 @@ export class TelosApi {
     if (!address) throw new Error('No address provided')
     if (address.startsWith('0x')) address = address.substring(2)
 
-    const padded = '0'.repeat(12 * 2) + address
+    const padded = '0'.repeat(12 * 2) + address.toLowerCase()
 
     const { rows } = await this.getTable({
       code: this.telosContract,
