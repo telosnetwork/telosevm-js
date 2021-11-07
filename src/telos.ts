@@ -318,7 +318,7 @@ export class TelosApi {
         let receiptInt = parseInt(receipt.gasused, 16);
         return receiptInt > resultInt ? `0x${receipt.gasused}` : result[0];
       } else {
-        if (receipt.gasused) {
+        if (receipt && receipt.hasOwnProperty('gasused')) {
           return `0x${receipt.gasused}`
         }
       }
