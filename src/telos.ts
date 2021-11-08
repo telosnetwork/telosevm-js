@@ -100,6 +100,35 @@ export class TelosApi {
     return rows[0].gas_price
   }
 
+  nameToUint64(name: any) {
+    let n = BigInt(0);
+
+    let i = 0;
+    for (; i < 12 && name[i]; i++) {
+      n |= BigInt(this.charToSymbol(name.charCodeAt(i)) & 0x1f) << BigInt(64 - 5 * (i + 1));
+    }
+
+    if (i == 12) {
+      n |= BigInt(this.charToSymbol(name.charCodeAt(i)) & 0x0f);
+    }
+
+    return n.toString();
+  }
+
+  charToSymbol(c: any) {
+    if (typeof c == 'string') c = c.charCodeAt(0);
+
+    if (c >= 'a'.charCodeAt(0) && c <= 'z'.charCodeAt(0)) {
+      return c - 'a'.charCodeAt(0) + 6;
+    }
+
+    if (c >= '1'.charCodeAt(0) && c <= '5'.charCodeAt(0)) {
+      return c - '1'.charCodeAt(0) + 1;
+    }
+
+    return 0;
+  }
+
   /**
    * Bundles actions into a transaction to send to Telos Api
    *
@@ -635,14 +664,16 @@ export class TelosApi {
    * @returns {Promise<Account>}
    */
   async getEthAccountByTelosAccount(account: string) {
+    const acctInt = this.nameToUint64(account);
+
     const { rows } = await this.getTable({
       code: this.telosContract,
       scope: this.telosContract,
       table: 'account',
       key_type: 'i64',
       index_position: 3,
-      lower_bound: account,
-      upper_bound: account,
+      lower_bound: acctInt,
+      upper_bound: acctInt,
       limit: 1
     })
 
