@@ -649,7 +649,7 @@ export class TelosApi {
       limit: 1
     })
 
-    if (rows.length && rows[0].key === key) {
+    if (rows.length && rows[0].key === paddedKey) {
       return '0x' + rows[0].value
     } else {
       return '0x0'
