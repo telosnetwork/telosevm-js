@@ -22,6 +22,10 @@ interface RevertError extends Error {
   evmCallOutput: string
 }
 
+interface GasEstimateError extends Error {
+  receipt: object
+}
+
 export interface TransactionVars {
   expiration: string
   ref_block_num: number
@@ -29,6 +33,7 @@ export interface TransactionVars {
 }
 
 class RevertError extends Error { }
+class GasEstimateError extends Error { }
 
 /**
  * Telos API used as a subset of EosEvmApi
@@ -336,6 +341,12 @@ export class TelosApi {
         receipt = JSON.parse(receiptLog);
       } catch (e) {
         console.log('WARNING: Failed to parse receiptLog in estimate gas');
+      }
+
+      if (receipt.status === 0) {
+        let e = new GasEstimateError("Gas estimation transaction failure");
+        e.receipt = receipt;
+        throw e;
       }
 
       if (result) {
