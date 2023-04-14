@@ -16,6 +16,12 @@ const RECEIPT_LOG_END = "}}RCPT";
 const transformEthAccount = (account: Account) => {
   account.address = `0x${account.address}`
   account.balance = new BN(account.balance, 16)._strip()
+  let code = account.code
+  if (typeof code !== 'string') {
+    code = Buffer.from(account.code).toString("hex")
+  }
+
+  account.code = `0x${code.replace(/^0x/, '')}`
   return account
 }
 interface RevertError extends Error {
