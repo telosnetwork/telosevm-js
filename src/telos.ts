@@ -16,6 +16,12 @@ const RECEIPT_LOG_END = "}}RCPT";
 const transformEthAccount = (account: Account) => {
   account.address = `0x${account.address}`
   account.balance = new BN(account.balance, 16)._strip()
+  let code = account.code
+  if (typeof code !== 'string') {
+    code = Buffer.from(account.code).toString("hex")
+  }
+
+  account.code = `0x${code.replace(/^0x/, '')}`
   return account
 }
 interface RevertError extends Error {
@@ -579,8 +585,9 @@ export class TelosApi {
    * @param address The ETH address in contract
    *
    * @returns {Promise<Account>} Account row associated with address
+   * or undefined if there is no account matching the address.
    */
-  async getEthAccount(address: string): Promise<Account> {
+  async getEthAccount(address: string): Promise<Account | undefined> {
     if (!address) throw new Error('No address provided')
     if (address.startsWith('0x')) address = address.substring(2)
 
@@ -601,7 +608,7 @@ export class TelosApi {
     if (rows.length && rows[0].address === address) {
       return transformEthAccount(rows[0])
     } else {
-      throw new Error(`Account with address ${address} not found`)
+      return undefined
     }
   }
 
@@ -624,13 +631,12 @@ export class TelosApi {
   async getNonce(address: any) {
     if (!address) return '0x0'
 
-    try {
-      const account = await this.getEthAccount(address)
-      return `0x${account.nonce.toString(16)}`
-    } catch (e) {
-      console.log(e)
-      return '0x0'
-    }
+    const account = await this.getEthAccount(address)
+
+    if (!account)
+        return '0x0'
+
+    return `0x${account.nonce.toString(16)}`
   }
 
   /**
@@ -648,10 +654,13 @@ export class TelosApi {
     if (key && key.startsWith('0x')) key = key.substring(2)
     const paddedKey = '0'.repeat(64 - key.length) + key
 
-    const { index } = await this.getEthAccount(address)
+    const acc = await this.getEthAccount(address)
+    if (!acc)
+        return '0x0';
+
     const { rows } = await this.getTable({
       code: this.telosContract,
-      scope: index,
+      scope: acc.index,
       table: 'accountstate',
       key_type: 'sha256',
       index_position: 2,
